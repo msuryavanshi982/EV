@@ -1,0 +1,83 @@
+SELECT * FROM IOCL_DT_Paradip.DummyData;
+u-- se IOCL_DT_Paradip;
+-- SELECt * from DummyData;
+SELECT 
+    AVG(profitability) AS profitability
+FROM 
+    DummyData;
+
+show columns from IOCL_DT_Paradip.DummyData; 
+  
+SELECT AVG(percentageDeviationFromPreviousDataPointProfitability) AS tendProfitaility
+FROM DummyData
+GROUP BY hour(timestamp), timestamp
+ORDER BY timestamp DESC
+LIMIT 10;
+
+SELECT AVG(energyEfficiency) AS energyEfficiency
+FROM DummyData;
+
+SELECT AVG(percentageDeviationFromPreviousDataPointEnergyEfficiency) AS tendEnergyEfficiency
+FROM DummyData
+GROUP BY hour(timestamp), timestamp
+ORDER BY timestamp DESC
+LIMIT 10;
+
+SELECT AVG(percentageConversion) AS percentageConversion
+FROM DummyData;
+
+SELECT AVG(percentageDeviationFromPreviousDataPointPercentConversion) AS tendPercentageConversion
+FROM DummyData
+GROUP BY hour(timestamp), timestamp
+ORDER BY timestamp DESC
+LIMIT 10;
+
+SELECT AVG(complianceScore) AS complianceScore
+FROM DummyData;
+
+SELECT AVG(percentageDeviationFromPreviousDataPointComplianceScore) AS tendComplianceScore
+FROM DummyData
+GROUP BY hour(timestamp), timestamp
+ORDER BY timestamp DESC
+LIMIT 10;
+
+SELECT AVG(unitUptime) AS unitUptime
+FROM DummyData;
+
+SELECT AVG(percentageDeviationFromPreviousDataPointUnitUptime) AS tendUnitUptime
+FROM DummyData
+GROUP BY hour(timestamp), timestamp
+ORDER BY timestamp DESC
+LIMIT 10;
+
+//-------------------------->>>
+
+use IOCL_DT_Paradip;
+SELECT * FROM IOCL_DT_Paradip.DummyData;
+SELECT 
+    HOUR(timestamp) AS hour_of_day,
+    AVG(energyEfficiency) AS energyEfficiency,
+    AVG(percentageDeviationFromPreviousDataPointEnergyEfficiency) AS tendEnergyEfficiency
+FROM DummyData
+WHERE 
+    (
+        -- All (6 AM to 6 AM of the next day)
+        (HOUR(timestamp) >= 6 AND HOUR(timestamp) < 18)
+        OR
+        -- Day (6 AM to 2 PM)
+        (HOUR(timestamp) >= 6 AND HOUR(timestamp) < 14)
+        OR
+        -- Evening (2 PM to 10 PM)
+        (HOUR(timestamp) >= 14 AND HOUR(timestamp) < 22)
+        OR
+        -- Night (10 PM to 6 AM of the next day)
+        (HOUR(timestamp) >= 22)
+        OR
+        -- Night (10 PM to 6 AM of the next day)
+         (HOUR(timestamp) < 6 AND timestamp >= DATE_ADD(DATE(timestamp), INTERVAL 1 DAY))
+    )
+GROUP BY 
+    hour_of_day
+ORDER BY 
+    hour_of_day DESC
+LIMIT 10;
